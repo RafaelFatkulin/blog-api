@@ -1,0 +1,15 @@
+{
+	"$schema": "./node_modules/oxlint/configuration_schema.json",
+	"plugins": ["typescript", "unicorn", "oxc", "eslint", "import", "node", "vitest", "promise"],
+	"categories": {
+		"correctness": "error"
+	},
+	"rules": {
+		"no-unused-vars": "error",
+		"typescript/await-thenable": "warn",
+		"unicorn/no-await-in-promise-methods": "off"
+	},
+	"env": {
+		"builtin": true
+	}
+}
