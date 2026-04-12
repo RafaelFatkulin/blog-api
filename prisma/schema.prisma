@@ -14,8 +14,8 @@ datasource db {
 
 model User {
   id           String   @id @default(uuid())
-  email        String   @unique
-  username     String   @unique
+  username     String   @unique @db.VarChar(30)
+  email        String   @unique @db.VarChar(255)
   passwordHash String   @map("password_hash")
   role         Role     @default(USER)
   createdAt    DateTime @default(now()) @map("created_at")
@@ -23,9 +23,25 @@ model User {
 
   posts    Post[]
   comments Comment[]
+  refreshTokens RefreshToken[]
 
   @@index([email])
   @@map("users")
+}
+
+model RefreshToken {
+  id        String   @id @default(uuid())
+  token     String   @unique
+  userId    String   @map("user_id")
+  expiresAt DateTime @map("expires_at")
+  createdAt DateTime @default(now()) @map("created_at")
+  revokedAt DateTime? @map("revoked_at")
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([token])
+  @@index([userId])
+  @@map("refresh_tokens")
 }
 
 model Post {
@@ -33,10 +49,13 @@ model Post {
   title     String
   slug      String   @unique
   content   String
+  excerpt   String?
   published Boolean  @default(false)
+  publishedAt  DateTime? @map("published_at")
   authorId  String   @map("author_id")
   createdAt DateTime @default(now()) @map("created_at")
   updatedAt DateTime @updatedAt @map("updated_at")
+  deletedAt DateTime? @map("deleted_at")
 
   author   User      @relation(fields: [authorId], references: [id], onDelete: Cascade)
   comments Comment[]
@@ -44,6 +63,7 @@ model Post {
 
   @@index([authorId])
   @@index([slug])
+  @@index([deletedAt])
   @@index([published, createdAt(sort: Desc)])
   @@map("posts")
 }
@@ -56,8 +76,8 @@ model Comment {
   createdAt DateTime @default(now()) @map("created_at")
   updatedAt DateTime @updatedAt @map("updated_at")
 
-  author User @relation(fields: [authorId], references: [id])
-  post   Post @relation(fields: [postId], references: [id])
+  author User @relation(fields: [authorId], references: [id], onDelete: Cascade)
+  post   Post @relation(fields: [postId], references: [id], onDelete: Cascade)
 
   @@index([postId])
   @@index([authorId])
@@ -65,9 +85,11 @@ model Comment {
 }
 
 model Tag {
-  id    String    @id @default(uuid())
-  name  String    @unique
-  posts PostTag[]
+  id        String   @id @default(uuid())
+  name      String   @unique
+  slug      String   @unique
+  createdAt DateTime @default(now()) @map("created_at")
+  posts     PostTag[]
 
   @@map("tags")
 }
@@ -75,6 +97,7 @@ model Tag {
 model PostTag {
   postId String @map("post_id")
   tagId  String @map("tag_id")
+  createdAt DateTime @default(now()) @map("created_at")
 
   post Post @relation(fields: [postId], references: [id], onDelete: Cascade)
   tag  Tag  @relation(fields: [tagId], references: [id], onDelete: Cascade)
