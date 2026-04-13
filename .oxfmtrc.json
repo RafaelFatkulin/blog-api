@@ -1,32 +1,32 @@
 {
-  "$schema": "https://unpkg.com/oxfmt/configuration_schema.json",
-  "arrowParens": "avoid",
-  "bracketSameLine": true,
-  "singleQuote": true,
-  "tabWidth": 4,
-  "semi": true,
-  "useTabs": true,
-  "singleAttributePerLine": true,
-  "trailingComma": "all",
-  "ignorePatterns": ["node_modules/", "dist/", "pnpm-lock.yaml"],
-  "overrides": [
-    {
-      "files": ["*.yaml", "*.yml"],
-      "options": {
-        "tabWidth": 2
-      }
-    },
-    {
-      "files": ["*.json"],
-      "options": {
-        "tabWidth": 4
-      }
-    },
-    {
-      "files": ["*.md"],
-      "options": {
-        "printWidth": 320
-      }
-    }
-  ]
+	"$schema": "https://unpkg.com/oxfmt/configuration_schema.json",
+	"arrowParens": "avoid",
+	"bracketSameLine": true,
+	"singleQuote": true,
+	"tabWidth": 4,
+	"semi": true,
+	"useTabs": true,
+	"singleAttributePerLine": true,
+	"trailingComma": "all",
+	"ignorePatterns": ["node_modules/", "dist/", "pnpm-lock.yaml"],
+	"overrides": [
+		{
+			"files": ["*.yaml", "*.yml"],
+			"options": {
+				"tabWidth": 2
+			}
+		},
+		{
+			"files": ["*.json"],
+			"options": {
+				"tabWidth": 4
+			}
+		},
+		{
+			"files": ["*.md"],
+			"options": {
+				"printWidth": 320
+			}
+		}
+	]
 }
