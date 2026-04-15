@@ -1,0 +1,4 @@
+-- 20260415103618_add_oauth_accounts
+-- Added OAuth accounts support
+-- Made password_hash nullable for OAuth-only users
+-- Created oauth_accounts table with Google/GitHub provider support

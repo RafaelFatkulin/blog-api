@@ -19,4 +19,10 @@ export const config = {
 	port: getEnv('PORT', '3000'),
 	logLevel: getEnv('LOG_LEVEL', 'info') as LogLevel,
 	nodeEnv: getEnv('NODE_ENV', 'development') as NodeEnv,
+	googleClientId: getEnv('GOOGLE_CLIENT_ID', ''),
+	googleClientSecret: getEnv('GOOGLE_CLIENT_SECRET', ''),
+	googleRedirectUri: getEnv('GOOGLE_REDIRECT_URI', 'http://localhost:3000/auth/google/callback'),
+	githubClientId: getEnv('GITHUB_CLIENT_ID', ''),
+	githubClientSecret: getEnv('GITHUB_CLIENT_SECRET', ''),
+	githubRedirectUri: getEnv('GITHUB_REDIRECT_URI', 'http://localhost:3000/auth/github/callback'),
 } as const;

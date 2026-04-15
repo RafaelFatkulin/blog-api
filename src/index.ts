@@ -5,6 +5,7 @@ import { config } from './config';
 import { errorHandler } from './common/middleware/error-handler.middleware.js';
 import { rateLimiter } from './common/middleware/rate-limit.middleware.js';
 import { postsRouter } from './modules/posts/posts.route';
+import { authRouter } from './modules/auth/auth.route';
 
 const app = new Hono();
 
@@ -17,6 +18,7 @@ app.get('/', c => {
 	return c.text('Hello Hono!');
 });
 
+app.route('/auth', authRouter);
 app.route('/posts', postsRouter);
 
 serve(

@@ -16,7 +16,7 @@ model User {
   id           String   @id @default(uuid())
   username     String   @unique @db.VarChar(30)
   email        String   @unique @db.VarChar(255)
-  passwordHash String   @map("password_hash")
+  passwordHash String?  @map("password_hash")
   role         Role     @default(USER)
   createdAt    DateTime @default(now()) @map("created_at")
   updatedAt    DateTime @updatedAt @map("updated_at")
@@ -24,9 +24,32 @@ model User {
   posts    Post[]
   comments Comment[]
   refreshTokens RefreshToken[]
+  accounts OAuthAccount[]
 
   @@index([email])
   @@map("users")
+}
+
+model OAuthAccount {
+  id           String   @id @default(uuid())
+  userId       String   @map("user_id")
+  provider     String   @db.VarChar(50)
+  providerId   String   @map("provider_id") @db.VarChar(255)
+  email        String?  @db.VarChar(255)
+  name         String?  @db.VarChar(255)
+  avatarUrl    String?  @map("avatar_url") @db.VarChar(500)
+  accessToken  String   @map("access_token") @db.Text
+  refreshToken String?  @map("refresh_token") @db.Text
+  expiresAt    DateTime? @map("expires_at")
+  createdAt    DateTime @default(now()) @map("created_at")
+  updatedAt    DateTime @updatedAt @map("updated_at")
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([provider, providerId])
+  @@index([userId])
+  @@index([provider])
+  @@map("oauth_accounts")
 }
 
 model RefreshToken {

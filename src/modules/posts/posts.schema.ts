@@ -10,7 +10,7 @@ export const createPostSchema = z.object({
 export const updatePostSchema = createPostSchema
 	.partial()
 	.refine(data => Object.keys(data).length > 0, {
-		error: 'Нужно передать хотя бы 1 поле',
+		error: 'At least one field must be provided',
 	});
 
 export const postQuerySchema = z.object({

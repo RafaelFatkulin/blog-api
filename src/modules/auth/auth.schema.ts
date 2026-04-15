@@ -19,3 +19,9 @@ export const authTokensSchema = z.object({
 	accessToken: z.string(),
 	refreshToken: z.string(),
 });
+
+export const refreshTokenSchema = z.object({
+	refreshToken: z.string(),
+});
+
+export const oauthProviderSchema = z.enum(['google', 'github']);

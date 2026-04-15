@@ -49,18 +49,46 @@ To add a new module, create these files, instantiate layers in the route file, a
 ### Shared code
 
 - `src/common/errors/` — `HttpError` hierarchy (NotFoundError, ValidationError, UnauthorizedError, ForbiddenError). All thrown errors are caught by the global `app.onError` handler.
-- `src/common/middleware/` — `errorHandler` (ZodError → 422, HttpError → matching code, unknown → 500), `rateLimiter`, `authMiddleware` (placeholder, reads `x-user-id` header — not real JWT auth yet)
+- `src/common/middleware/` — `errorHandler` (ZodError → 422, HttpError → matching code, unknown → 500), `rateLimiter`, `authMiddleware` (JWT Bearer token verification)
 - `src/common/pagination/` — `getPaginationParams()` / `buildPaginatedResult()`
 - `src/common/utils/sluggify.ts` — `slugify()` utility
 
+## Auth module
+
+Implemented with email/password + OAuth2.0 (Google, GitHub) via `@hono/oauth-providers`.
+
+### Endpoints
+
+| Method | Path                    | Auth | Description                                |
+| ------ | ----------------------- | ---- | ------------------------------------------ |
+| POST   | `/auth/register`        | No   | Register with email + password             |
+| POST   | `/auth/login`           | No   | Login with email + password                |
+| POST   | `/auth/refresh`         | No   | Refresh access token using refresh token   |
+| POST   | `/auth/logout`          | No   | Revoke a single refresh token              |
+| POST   | `/auth/logout-all`      | Yes  | Revoke all refresh tokens for current user |
+| GET    | `/auth/me`              | Yes  | Get current user profile                   |
+| GET    | `/auth/google`          | No   | Initiate Google OAuth flow                 |
+| GET    | `/auth/google/callback` | No   | Google OAuth callback handler              |
+| GET    | `/auth/github`          | No   | Initiate GitHub OAuth flow                 |
+| GET    | `/auth/github/callback` | No   | GitHub OAuth callback handler              |
+
+### OAuth provider architecture
+
+The auth module uses `@hono/oauth-providers` (official Hono package) for OAuth2 flows. Adding a new provider requires:
+
+1. Install the provider from `@hono/oauth-providers/<name>` (if not already available)
+2. Add client ID, secret, and redirect URI to `src/config.ts`
+3. Add a new route in `src/modules/auth/auth.route.ts` using the provider's middleware
+4. Update `auth.controller.ts` `oauthCallback` to handle the new provider's user shape
+
+All OAuth users are stored in the `User` table with `passwordHash: null`, and their provider-specific data lives in `OAuthAccount`. This allows linking multiple OAuth providers to a single user account (matched by email).
+
 ## Known issues (as of current state)
 
-- **`src/config.ts` lines 17-18**: `jwtExpiresIn` reads `JWT_SECRET` instead of `JWT_EXPIRES_IN`; `jwtRefreshExpiresIn` reads `JWT_REFRESH_SECRET` instead of `JWT_REFRESH_EXPIRES_IN`. These are copy-paste bugs.
-- **Auth module is stub-only**: `src/modules/auth/` has schemas and DTOs but no route/controller/service/repository. `bcryptjs` and `jsonwebtoken` are installed but unused.
-- **Auth middleware is not real auth**: `authMiddleware` trusts `x-user-id` header. No JWT verification.
-- **Comments, Tags, Users CRUD**: Schema exists but no code.
-- **Redis**: Defined in `docker-compose.yml` but never used by the app.
-- **Soft delete**: `Post.deletedAt` field exists but `delete()` performs hard delete.
+- **Comments, Tags, Users CRUD**: Schema exists but no application code.
+- **Redis**: Defined in `docker-compose.yml` but never used by the app. Rate limiter uses in-memory Map.
+- **No seed file**: `db:seed` script exists in package.json but no seed implementation.
+- **No tests**: Vitest is configured but zero test files exist.
 
 ## Code style
 
