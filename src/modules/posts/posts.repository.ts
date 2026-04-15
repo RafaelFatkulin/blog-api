@@ -29,10 +29,11 @@ export class PostsRepository {
 
 	async findAll(params: FindAllParams): Promise<[PostWithAuthor[], number]> {
 		const where = {
+			deletedAt: null,
 			...(params.published !== undefined && { published: params.published }),
 			...(params.authorId && { authorId: params.authorId }),
 			...(params.tag && {
-				some: { tag: { slug: params.tag } },
+				tags: { some: { tag: { slug: params.tag } } },
 			}),
 		};
 
@@ -51,15 +52,15 @@ export class PostsRepository {
 	}
 
 	async findBySlug(slug: string): Promise<PostWithDetails | null> {
-		return this.db.post.findUnique({
-			where: { slug },
+		return this.db.post.findFirst({
+			where: { slug, deletedAt: null },
 			include: POST_WITH_DETAILS,
 		});
 	}
 
 	async findById(id: string): Promise<PostWithAuthor | null> {
-		return this.db.post.findUnique({
-			where: { id },
+		return this.db.post.findFirst({
+			where: { id, deletedAt: null },
 			include: POST_WITH_AUTHOR,
 		});
 	}
@@ -108,10 +109,13 @@ export class PostsRepository {
 		});
 	}
 
-	async delete(id: string): Promise<boolean> {
+	async softDelete(id: string): Promise<boolean> {
 		const exists = await this.findById(id);
 		if (!exists) return false;
-		await this.db.post.delete({ where: { id } });
+		await this.db.post.update({
+			where: { id },
+			data: { deletedAt: new Date() },
+		});
 		return true;
 	}
 

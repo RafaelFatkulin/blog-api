@@ -54,6 +54,7 @@ export class PostsService {
 		if (!post) throw new NotFoundError('Post');
 		if (post.authorId !== requesterId) throw new ForbiddenError();
 
-		await this.repository.delete(id);
+		const deleted = await this.repository.softDelete(id);
+		if (!deleted) throw new NotFoundError('Post');
 	}
 }

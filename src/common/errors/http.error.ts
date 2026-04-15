@@ -10,7 +10,7 @@ export class HttpError extends Error {
 
 export class NotFoundError extends HttpError {
 	constructor(resource: string) {
-		super(404, `${resource} не найден`);
+		super(404, `${resource} not found`);
 	}
 }
 
@@ -28,6 +28,6 @@ export class UnauthorizedError extends HttpError {
 
 export class ForbiddenError extends HttpError {
 	constructor() {
-		super(403, 'Доступ запрещен');
+		super(403, 'Access denied');
 	}
 }
